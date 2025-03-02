@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { TUser } from "../types";
+import { ERole, TUser } from "../types";
 import { testUser } from "../data/user";
 
 type TUserInitialState = {
@@ -8,6 +8,7 @@ type TUserInitialState = {
     previousPage: string;
     user: TUser | null;
     error: string | null;
+
 }
 
 const initialState: TUserInitialState = {
@@ -26,6 +27,7 @@ const userSlice = createSlice({
             state.isUserAuthed = true;
             state.error = null;
             state.user = action.payload;
+            state.user!.role = ERole.USER
             state.loading = false;
         },
         setUser: (state, action) => {
@@ -39,9 +41,6 @@ const userSlice = createSlice({
         },
         setAddress: (state, action) => {
             if(state.user) state.user.address = action.payload;
-        },
-        setStore: (state, action) => {
-            if(state.user) state.user.store = action.payload;
         },
         setCreditCard: (state, action) => {
             if(state.user) state.user.creditCard = action.payload;

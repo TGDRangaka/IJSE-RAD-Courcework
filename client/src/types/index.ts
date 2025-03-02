@@ -40,8 +40,13 @@ export interface TUser {
     creditCard?: TCreditCard | null;
     createdAt?: Date;
     updatedAt?: Date;
-    store?: any;
     cart?: any;
+    role: ERole;
+}
+
+export enum ERole {
+    ADMIN = 'admin',
+    USER = 'user'
 }
 
 export interface TStore {

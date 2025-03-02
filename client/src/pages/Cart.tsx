@@ -17,6 +17,10 @@ function Cart() {
     const items = useSelector((state: RootState) => state.cart.cartItems);
     const cart = useSelector((state: RootState) => state.cart);
 
+    const handleCheckout = () => {
+      navigate('/checkout')
+    }
+
     return (
         <div className="container xl:max-w-7xl flex-grow py-3 mt-12 min-h-svh">
       <h2 className="text-gray-800 mt-10 mb-3">Shopping Cart (5)</h2>
@@ -50,6 +54,7 @@ function Cart() {
             <button
               type="button"
               className="w-full h-12 text-xl bg-gray-800 text-gray-200 rounded-3xl mt-3 hover:bg-gray-950 duration-300 ease-in-out"
+              onClick={handleCheckout}
             >
               Checkout
             </button>

@@ -65,10 +65,6 @@ export default function Profile() {
                         <>
                             <Li to="/profile/my-profile" icon={faUser}>My Profile</Li>
                             <Li to="/profile/my-orders" icon={faBoxOpen}>My Orders</Li>
-                            {user.user.store && <>
-                                <Li to="/profile/manage-items" icon={faClipboardList}>Manage Items</Li>
-                                <Li to="/profile/add-item/new" icon={faPlus}>Add a Item</Li>
-                            </>}
                             <Li
                                 to='/'
                                 icon={faLeftLong}

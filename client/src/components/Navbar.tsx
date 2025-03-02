@@ -21,9 +21,9 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-main flex items-center justify-between px-40 py-3 w-screen z-30">
+    <nav className="bg-main flex items-center justify-center px-40 py-3 w-screen z-30 fixed top-0">
       {/* Left section */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 absolute left-40">
         <Link to='/' className="flex items-center space-x-1 text-black font-bold text-xl hover:scale-105 hover:text-gray-800 duration-200">
           <span className="font-semibold">Spare.LK</span>
         </Link>
@@ -37,7 +37,7 @@ const Navbar = () => {
       </div>
 
       {/* Right section */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 absolute right-40">
         <Link to='cart'><FiShoppingCart className="text-black h-6 w-6 hover:text-gray-800 cursor-pointer hover:scale-105 hover:rotate-6 duration-75" /></Link>
         <div
           onMouseOver={() => setIsMenuOpen(true)}
@@ -53,10 +53,6 @@ const Navbar = () => {
               <div className="absolute bg-yellow-300 shadow-md w-64 p-2 rounded-md top-[100%] right-0 left-0 m-auto">
                 <Li to="/profile/my-profile" icon={faUser}>My Profile</Li>
                 <Li to="/profile/my-orders" icon={faBoxOpen}>Orders</Li>
-                {user.store && <>
-                  <Li to="/profile/manage-items" icon={faClipboardList}>Manage Items</Li>
-                  <Li to="/profile/add-item/new" icon={faPlus}>Add a Item</Li>
-                </>}
                 <Li
                   to='/'
                   icon={faLeftLong}
