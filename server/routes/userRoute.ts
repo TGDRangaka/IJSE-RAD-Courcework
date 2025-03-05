@@ -12,7 +12,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
 });
 
-router.post('/', async (req: Request, res: Response) => {
+router.post('/register', async (req: Request, res: Response) => {
     try {
         const result = await userController.register(req.body);
         res.status(200).json({ success: true, data: result });
@@ -23,8 +23,8 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.put('/:id', async (req: Request, res: Response) => {
     try {
-        const result = await userController.update(req.params.id, req.body);
-        res.status(200).json({ success: true, _id: result?._id });
+        await userController.update(req.params.id, req.body);
+        res.status(200).json({ success: true });
     } catch (err) {
         res.status(500).json({ success: false, err: err });
     }
@@ -39,9 +39,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
     }
 });
 
-router.get('/:username/:password', async (req: Request, res: Response) => {
+router.post('/login', async (req: Request, res: Response) => {
     try {
-        const result = await userController.login(req.params.username, req.params.password);
+        const result = await userController.login(req.body.username, req.body.password);
         if (result) {
             res.status(200).json({ success: true, data: result });
         } else {

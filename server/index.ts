@@ -13,11 +13,9 @@ const colors = {
   yellow: "\x1b[33m",
 };
 
-// import userRoute from "./routes/userRoute";
-// import itemRoute from "./routes/itemRoute";
-// import cartRoute from "./routes/cartRoute";
-// import storeRoute from "./routes/storeRoute";
-// import orderRoute from "./routes/orderRoute";
+import userRoute from "./routes/userRoute";
+import itemRoute from "./routes/itemRoute";
+import cartRoute from "./routes/cartRoute";
 
 const app = express();
 const port: number = 3000;
@@ -38,12 +36,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(cors());
 app.use(express.json());
 
-// app.use("/images", express.static("./assets/images/"));
-// app.use("/api/user", userRoute);
-// app.use("/item", itemRoute);
-// app.use("/cart", cartRoute);
-// app.use("/store", storeRoute);
-// app.use("/order", orderRoute);
+app.use("/images", express.static("./assets/images/"));
+app.use("/api/user", userRoute);
+app.use("/item", itemRoute);
+app.use("/cart", cartRoute);
 
 mongoose
   .connect(uri)
