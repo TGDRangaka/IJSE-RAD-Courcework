@@ -1,7 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { IUser } from '../models/userModel';
+import jwt from 'jsonwebtoken';
 
-async function deleteImage(imagePath: string): Promise<void> {
+const authToken: string = process.env.JWT_SECRET || 'slkdfjaslnvlksdlkjflksndlkmalkjskjsoiweoiuouewoijlkdfklasjdfkj';
+
+export async function deleteImage(imagePath: string): Promise<void> {
     try {
         const fullPath = path.join(__dirname, '..', 'assets', 'images', imagePath);
         await fs.access(fullPath); // Check if file exists
@@ -16,4 +20,8 @@ async function deleteImage(imagePath: string): Promise<void> {
     }
 }
 
-export default deleteImage;
+export const getJwtToken = (user: IUser, duration: any) => {
+    return jwt.sign({ userId: user._id, role: user.role }, authToken, {
+        expiresIn: duration,
+    });
+}

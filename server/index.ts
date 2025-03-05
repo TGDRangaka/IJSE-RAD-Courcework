@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const colors = {
 import userRoute from "./routes/userRoute";
 import itemRoute from "./routes/itemRoute";
 import cartRoute from "./routes/cartRoute";
+import { verifyToken } from "./middleware/authMiddleware";
 
 const app = express();
 const port: number = 3000;
@@ -34,12 +36,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 
-app.use("/images", express.static("./assets/images/"));
-app.use("/api/user", userRoute);
-app.use("/item", itemRoute);
-app.use("/cart", cartRoute);
+app.use("/sparelk/api/v1/images", express.static("./assets/images/"));
+app.use("/sparelk/api/v1/user", userRoute);
+app.use("/sparelk/api/v1/item", verifyToken, itemRoute);
+app.use("/sparelk/api/v1/cart", verifyToken, cartRoute);
 
 mongoose
   .connect(uri)

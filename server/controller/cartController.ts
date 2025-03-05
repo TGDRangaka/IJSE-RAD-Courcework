@@ -3,12 +3,7 @@ import { Document } from 'mongoose';
 
 class CartController {
     async getCart(userId: string) {
-        return Cart.findOne({ userId });
-        // return Cart.findOne({ userId })
-        //     .populate({
-        //         path: 'items.itemId',
-        //         match: { isActive: true } // Filter the items by isActive field
-        //     });
+        return await Cart.findOne({ userId });
     }
 
     async getAll() {
@@ -73,7 +68,7 @@ class CartController {
 
     async removeItemFromAllCarts(itemId: string) {
         const carts = await Cart.find();
-        return Promise.all(carts.map(cart => this.deleteItem(cart._id.toString(), itemId)));
+        return Promise.all(carts.map(cart => this.deleteItem((cart._id as any).toString(), itemId)));
     }
 }
 

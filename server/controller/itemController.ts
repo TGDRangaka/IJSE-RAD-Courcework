@@ -1,6 +1,6 @@
 import Item, { IItem } from '../models/itemModel';
 import Cart from '../controller/cartController';
-import deleteImage from '../util/utilMatters';
+import {deleteImage} from '../util/utilMatters';
 
 class ItemModel {
     async getAll(): Promise<IItem[]> {
