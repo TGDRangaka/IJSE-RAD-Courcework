@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import Login from "./Login";
 import Register from "./Register";
 import { userActions } from "../../reducers/userSlice";
 import { FiLoader } from "react-icons/fi";
+import { api } from "../../api/api";
 
 type Props = {
     children: React.ReactNode;
@@ -19,11 +19,20 @@ export default function AuthProvider({ children }: Props) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user') + "");
-        console.log(user);
+        const user = JSON.parse(localStorage.getItem('user') as string);
         if (user) {
-            dispatch(userActions.login(user));
-            setIsLogin(false);
+            api.post('user/refresh').then(response => {
+                if (response.status === 200) {
+                    dispatch(userActions.login(user));
+                    setIsLogin(true);
+                }
+                setTimeout(() => setLoading(false), 500);
+            }).catch(error => {
+                console.error(error);
+                localStorage.removeItem('user');
+                setIsLogin(true);
+            });
+            return;
         }
 
         setTimeout(() => setLoading(false), 500);

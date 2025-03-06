@@ -21,7 +21,7 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-main flex items-center justify-center px-40 py-3 w-screen z-30 fixed top-0">
+    <nav className="bg-main flex items-center justify-center px-40 py-3 w-screen z-30  top-0">
       {/* Left section */}
       <div className="flex items-center space-x-4 absolute left-40">
         <Link to='/' className="flex items-center space-x-1 text-black font-bold text-xl hover:scale-105 hover:text-gray-800 duration-200">

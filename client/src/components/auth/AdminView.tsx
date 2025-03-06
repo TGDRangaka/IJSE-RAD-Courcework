@@ -3,6 +3,8 @@ import Dashboard from '../../pages/admin/Dashboard'
 import SideBar from '../admin/SideBar'
 import AdminHeader from '../admin/AdminHeader'
 import Customers from '../../pages/admin/Customers'
+import Inventory from '../../pages/admin/Inventory'
+import Orders from '../../pages/admin/Orders'
 
 export default function AdminView() {
     return (
@@ -15,6 +17,8 @@ export default function AdminView() {
                     <Route path="/">
                         <Route path="/" element={<Dashboard />} />
                         <Route path="customers" element={<Customers />} />
+                        <Route path="inventory" element={<Inventory />} />
+                        <Route path="orders" element={<Orders />} />
                     </Route>
                 </Routes>
             </div>
