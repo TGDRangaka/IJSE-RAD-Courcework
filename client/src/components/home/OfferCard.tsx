@@ -10,7 +10,7 @@ type Props = {
     onClick?: () => void;
 }
 
-export default function OfferCard({ h1, h2, p, btnText, imgLink, onClick }: Props) {
+export default function OfferCard({ h1, h2, p, btnText, imgLink }: Props) {
   const navigate = useNavigate();
 
   return (

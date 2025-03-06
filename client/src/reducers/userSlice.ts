@@ -27,7 +27,7 @@ const userSlice = createSlice({
             state.isUserAuthed = true;
             state.error = null;
             state.user = action.payload;
-            state.user!.role = ERole.USER
+            // state.user!.role = ERole.ADMIN
             state.loading = false;
         },
         setUser: (state, action) => {

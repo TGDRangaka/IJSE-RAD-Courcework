@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { userActions } from '../../reducers/userSlice';
 import { testUser } from '../../data/user';
+import { api } from '../../api/api';
 
 type Props = {
     setIsLogin: (arg: boolean) => void;
@@ -17,7 +18,28 @@ export default function Login({ setIsLogin }: Props) {
 
     const dispatch = useDispatch();
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        if (!email || !password) {
+            return;
+        }
+
+        try {
+            const response = await api.post('user/login', { email: email, password: password });
+
+            if(response.status === 200){
+                console.log(response);
+                const user = response.data.user;
+                dispatch(userActions.login(user));
+                setIsLogin(true);
+                localStorage.setItem('user', JSON.stringify(user));
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Invalid email or password');
+            return;
+        }
+
+
         dispatch(userActions.login(testUser));
     };
 

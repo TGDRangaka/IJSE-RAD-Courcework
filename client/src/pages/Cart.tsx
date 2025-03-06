@@ -1,10 +1,6 @@
-import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { api } from '../api/api';
-import { userActions } from '../reducers/userSlice';
-import { cartActions } from '../reducers/cartSlice';
 import CartItem from '../components/cart/CartItem';
 import { FiInfo } from 'react-icons/fi';
 
