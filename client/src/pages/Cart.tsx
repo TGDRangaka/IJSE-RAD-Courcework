@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { api } from '../api/api';
-import { userActions } from '../reducers/userSlice';
 import { cartActions } from '../reducers/cartSlice';
 import CartItem from '../components/cart/CartItem';
 import { FiInfo } from 'react-icons/fi';
@@ -25,7 +24,7 @@ function Cart() {
 
   const updateCart = async () => {
     try {
-      const res = await api.put(`items/${cart.cartId}`, items);
+      const res = await api.put(`cart/items/${cart.cartId}`, items);
       if (res.status === 200) {
         return true;
       }
@@ -50,7 +49,7 @@ function Cart() {
   const handleCheckout = () => {
     updateCart().then(res => {
       if (res) {
-        navigate('/checkout');
+        navigate(`/cart/place-order/${cart.cartId}`);
       } else {
         alert('Failed to update cart. Please try again.');
       }
