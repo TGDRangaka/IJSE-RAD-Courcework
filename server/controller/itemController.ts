@@ -8,7 +8,7 @@ class ItemModel {
     }
 
     async getItem(id: string): Promise<IItem | null> {
-        return Item.findById(id).populate('store', 'name');
+        return Item.findById(id).populate('name');
     }
 
     async getDiscounts(): Promise<IItem[]> {

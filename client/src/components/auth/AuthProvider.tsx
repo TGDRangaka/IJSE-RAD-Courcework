@@ -6,6 +6,7 @@ import Register from "./Register";
 import { userActions } from "../../reducers/userSlice";
 import { FiLoader } from "react-icons/fi";
 import { api } from "../../api/api";
+import { cartActions } from "../../reducers/cartSlice";
 
 type Props = {
     children: React.ReactNode;
@@ -20,10 +21,12 @@ export default function AuthProvider({ children }: Props) {
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user') as string);
+        const cart = JSON.parse(localStorage.getItem('cart') as string);
         if (user) {
             api.post('user/refresh').then(response => {
                 if (response.status === 200) {
                     dispatch(userActions.login(user));
+                    dispatch(cartActions.setData({ userId: user._id, cartId: cart._id }))
                     setIsLogin(true);
                 }
                 setTimeout(() => setLoading(false), 500);

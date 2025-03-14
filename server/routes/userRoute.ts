@@ -48,14 +48,14 @@ router.post('/login', async (req: Request, res: Response) => {
             res.cookie('accessToken', result.accessToken, {
                 httpOnly: true,
                 secure: false,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 maxAge: 3 * 60 * 60 * 1000 // 3 hours
             });
 
             res.cookie('refreshToken', result.refreshToken, {
                 httpOnly: true,
                 secure: false,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 maxAge: 72 * 60 * 60 * 1000 // 72 hours
             });
 

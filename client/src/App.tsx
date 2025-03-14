@@ -14,7 +14,7 @@ function App() {
       <CookiesProvider>
         <AuthProvider>
           {
-            user?.role === ERole.USER
+            user?.role !== ERole.USER
               ? (
                 <UserView />
               )

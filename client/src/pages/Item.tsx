@@ -13,7 +13,6 @@ import { TItem } from '../types';
 import { userActions } from '../reducers/userSlice';
 import ItemCard from '../components/ItemCard';
 import RatingsReviews from '../components/items/RatingsReviews';
-import { items as testItems } from '../data/items';
 
 function Item() {
     const params = useParams();
@@ -22,14 +21,53 @@ function Item() {
     const dispatch = useDispatch();
     const itemId = params.itemId;
 
-    const isUserLoggedIn = useSelector((state: RootState) => state.user.isUserAuthed);
-    const user = useSelector((state: RootState) => state.user);
+    const { isUserAuthed } = useSelector((state: RootState) => state.user);
+    const { cartId } = useSelector((state: RootState) => state.cart);
 
-    const [item, setItem] = useState<TItem>(testItems[3]);
+    const [item, setItem] = useState<TItem | null>(null);
     const [itemQty, setItemQty] = useState(1);
     const [items, setAllItems] = useState([]);
 
+
+
+    function getItemRequest() {
+        api.get('item/' + itemId).then(result => {
+            setItem(result.data.data)
+            console.log(result.data.data)
+        }).catch(err => console.log(err));
+    }
+
+    function getAllItems() {
+        api.get('item/all').then(result => {
+            setAllItems(result.data.data)
+        }).catch(err => console.log(err));
+    }
+
+    function addItemCart() {
+        api.put(`cart/add/${cartId}`, { itemId: itemId, qty: itemQty }).then(result => {
+            console.log(result.data.data);
+            dispatch(cartActions.addItemToCart({ itemId: itemId, qty: itemQty }))
+            addedToCartAlert();
+        }).catch(err => console.log(err));
+    }
+
+    const addedToCartAlert = () => {
+        Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Item Added to Cart",
+            showConfirmButton: true,
+            confirmButtonText: "View Cart",
+            timer: 3000
+        }).then(result => {
+            if (result.isConfirmed) {
+                navigate(`/cart`);
+            }
+        })
+    }
     useEffect(() => {
+        getItemRequest();
+        getAllItems();
         window.scrollTo({ top: 0 });
     }, [params.itemId])
 
@@ -44,8 +82,8 @@ function Item() {
 
             <div className='flex flex-col md:flex-row bg-pane-color rounded-2xl overflow-hidden mt-3 pb-3'>
                 <div className='flex items-center justify-center md:w-72 lg:w-96'>
-                    {/* <div className='aspect-square h-72 lg:h-96 md:w-full bg-cover bg-center' style={{ backgroundImage: `url(http://localhost:3000/images/${item.image})` }}></div> */}
-                    <div className='aspect-square h-72 lg:h-96 md:w-full bg-cover bg-center' style={{ backgroundImage: `url(/tires-category.png)` }}></div>
+                    <div className='aspect-square h-72 lg:h-96 md:w-full bg-cover bg-center' style={{ backgroundImage: `url(http://localhost:3000/images/${item.image})` }}></div>
+                    {/* <div className='aspect-square h-72 lg:h-96 md:w-full bg-cover bg-center' style={{ backgroundImage: `url(/tires-category.png)` }}></div> */}
                 </div>
 
                 <div className='flex flex-grow flex-col px-5 pt-3'>
@@ -94,8 +132,8 @@ function Item() {
                         <button className='bg-blue-500 rounded-md py-1 px-3 shadow-lg w-full sm:w-fit'
                             onClick={() => {
                                 // Add Item to Cart
-                                if (isUserLoggedIn) {
-                                    // addItemCart()
+                                if (isUserAuthed) {
+                                    addItemCart()
                                 } else {
                                     dispatch(userActions.setPreviosPage(location.pathname))
                                     navigate('/login');

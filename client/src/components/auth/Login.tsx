@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { userActions } from '../../reducers/userSlice';
 import { testUser } from '../../data/user';
 import { api } from '../../api/api';
+import { cartActions } from '../../reducers/cartSlice';
 
 type Props = {
     setIsLogin: (arg: boolean) => void;
@@ -30,8 +31,10 @@ export default function Login({ setIsLogin }: Props) {
                 console.log(response);
                 const user = response.data.user;
                 dispatch(userActions.login(user));
+                dispatch(cartActions.setData({ userId: user._id, cartId: response.data.cart._id}))
                 setIsLogin(true);
                 localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('cart', JSON.stringify(response.data.cart));
             }
         } catch (err) {
             console.error(err);
