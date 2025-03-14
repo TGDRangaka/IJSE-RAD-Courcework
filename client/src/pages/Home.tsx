@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'
-import ItemCard from '../components/ItemCard';
-
-import { items } from '../data/items';
-import CategoryCard from '../components/CategoryCard';
-import DiscountItemCard from '../components/DiscountItemCard';
-import { allCategories } from '../data/categories';
+// import { allCategories } from '../data/categories';
 import Slider from '../components/home/Slider';
 import Section from '../components/Section';
 import OfferCard from '../components/home/OfferCard';
@@ -18,7 +12,7 @@ import { api } from '../api/api';
 export default function Home() {
   const [allItems, setAllItems] = useState([]);
   const [discountItems, setDiscountItems] = useState([]);
-  const [categories, setCategories] = useState(allCategories);
+  // const [categories, setCategories] = useState(allCategories);
   const [clickedTab, setClickedTab] = useState<'latest' | 'discount' | 'trending'>('latest');
 
 

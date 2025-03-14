@@ -24,10 +24,10 @@ export default function ItemCard({itm}: Props) {
       <h6 className='text-sm text-gray-500 mx-3 mt-3'>{item.category}</h6>
       <h6 className=" mx-3 truncate text-lg">{item.name}</h6>
       {(item.discount != 0) && <span className="mx-3 mt-1 text-gray-400">
-        <h6 className="line-through  text-sm">Rs.{item.price}</h6>
+        <h6 className="line-through  text-sm">Rs. {item.price}</h6>
         <h6 className=" ml-3  text-sm">-{item.discount}%</h6>
       </span>}
-      <h4 className="px-3 text-xl text-gray-900 font-bold bg-main/70">Rs.{parseFloat(item.price * ((100 - item.discount) / 100) + "").toFixed(2)}</h4>
+      <h4 className="px-3 text-xl text-gray-900 font-bold bg-main/70">Rs. {parseFloat(item.price * ((100 - item.discount) / 100) + "").toFixed(2)}</h4>
       <span className='flex-grow'></span>
       <span className='mx-3'>
       { 
