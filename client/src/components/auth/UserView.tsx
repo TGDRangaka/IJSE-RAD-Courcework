@@ -22,7 +22,8 @@ export default function UserView() {
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/aboutus" element={<AboutUs />} />
                 <Route path="/item/:itemId" element={<Item />} />
-                <Route path='/checkout' element={<Order />} />
+                <Route path='/item/place-order/:itemId/:qty' element={<Order />} />
+                <Route path='/cart/place-order/:cartId' element={<Order />} />
                 <Route path='profile' element={<Profile />}>
                     <Route path='my-profile' element={<MyProfile />} />
                     <Route path='my-orders' element={<MyOrders />} />

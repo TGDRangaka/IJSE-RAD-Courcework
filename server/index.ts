@@ -17,6 +17,7 @@ const colors = {
 import userRoute from "./routes/userRoute";
 import itemRoute from "./routes/itemRoute";
 import cartRoute from "./routes/cartRoute";
+import orderRoute from "./routes/orderRoute";
 import { verifyToken } from "./middleware/authMiddleware";
 
 const app = express();
@@ -46,6 +47,7 @@ app.use("/sparelk/api/v1/images", express.static("./assets/images/"));
 app.use("/sparelk/api/v1/user", userRoute);
 app.use("/sparelk/api/v1/item", verifyToken, itemRoute);
 app.use("/sparelk/api/v1/cart", verifyToken, cartRoute);
+app.use("/sparelk/api/v1/order", verifyToken, orderRoute);
 
 mongoose
   .connect(uri)

@@ -1,197 +1,205 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import OrderItem from "../components/order/OrderItem";
-import CreditCardForm from "../components/order/CreditCardForm";
-import AddressForm from "../components/order/AddressForm";
-import { FiCheck, FiCreditCard, FiInfo, FiMapPin, FiUser, FiX } from "react-icons/fi";
-import { toast } from "react-toastify";
-import { RootState } from "../store/store";
-import Page from "../components/Page";
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
+import { RootState } from '../store/store';
+import { userActions } from '../reducers/userSlice';
+import { api } from '../api/api';
+import { cartActions } from '../reducers/cartSlice';
+import OrderItem from '../components/order/OrderItem';
+import CreditCardForm from '../components/order/CreditCardForm';
+import AddressForm from '../components/order/AddressForm';
 
-const Order = () => {
+function PlaceOrder() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const params = useParams();
 
-    const { cartItems, total } = useSelector((state: RootState) => state.cart);
-    const { isUserAuthed, user } = useSelector((state: RootState) => state.user);
+    const [orderItems, setOrderItems] = useState<any>([]);
+    const [isAddressFormOpened, setAddressForm] = useState(false);
+    const [isCreditCardFormOpened, setCreditCardForm] = useState(false);
+    const [total, setTotal] = useState(0);
 
-    const [isAddressFormOpen, setAddressForm] = useState(false);
-    const [isCreditCardFormOpen, setCreditCardForm] = useState(false);
+    const user = useSelector((state: RootState) => state.user.user);
+    const isUserLoggedIn = useSelector((state: RootState) => state.user.isUserAuthed);
+    const cartItems = useSelector((state: RootState) => state.cart.cartItems);
 
-    const handleOrderConfirm = async () => {
-        toast.success("Order Placed successfully!")
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        navigate('/')
+    if (!user) return <></>
+
+    useEffect(() => {
+        if (isUserLoggedIn) {
+            getOrderItems()
+        } else {
+            dispatch(userActions.setPreviosPage(location.pathname))
+            console.log(location.pathname);
+            navigate('/login');
+        }
+    }, [])
+
+    function getOrderItems() {
+        if (location.pathname.split('/')[1] === 'item') {
+            setOrderItems([{ itemId: params.itemId, qty: params.qty }]);
+        } else if (location.pathname.split('/')[1] === 'cart') {
+            setOrderItems(cartItems);
+        }
     }
 
-    if (!isUserAuthed || !user) {
-        return (
-            <Page>
-                <div className="flex items-center justify-center h-full text-gray-500">
-                    <FiInfo className="w-10 h-10" />
-                    <p className="ml-3">Please login to view your shopping cart</p>
-                </div>
-            </Page>
-        );
+    function setOrderItemTotal(itemId: string, price: number) {
+        setOrderItems((orderItems: any) => orderItems.map((item: any) => {
+            if (item.itemId === itemId) {
+                return { ...item, total: price }
+            } else {
+                return item
+            }
+        }));
     }
+
+    function saveOrder() {
+        api.post('order/' + (location.pathname.split('/')[1] === 'cart' ? 'cart' : 'item'), {
+            userId: user?._id,
+            orderItems: orderItems
+        }).then(result => {
+            console.log(result.data.data);
+            orderConfirmedAlert();
+            if (location.pathname.split('/')[1] === 'cart') dispatch(cartActions.clearCart());
+            navigate('/');
+        }).catch(err => {
+            console.log(err);
+        })
+    }
+
+    const orderConfirmedAlert = () => {
+        Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Order Placed Successfully",
+            showConfirmButton: true,
+            confirmButtonText: "Check Orders",
+            timer: 3000
+        }).then(result => {
+            if (result.isConfirmed) {
+                navigate('/profile/my-orders');
+            }
+        })
+    }
+
+    const placeOrderAlert = () => {
+        if (!user?.address || !user.creditCard) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: 'Please fill the address and credit card details',
+            })
+            return;
+        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Place Order"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                saveOrder();
+            }
+        })
+    }
+
 
     return (
-        <div className="container xl:max-w-7xl flex-grow py-3 min-h-svh">
-            <h2 className="text-white mt-10">Checkout</h2>
+        isUserLoggedIn &&
+        <main className="container xl:max-w-7xl flex-grow py-3">
+            <h2 className="my-3 text-3xl md:text-4xl">Place Order</h2>
 
-            <div className="grid grid-cols-5 gap-28">
-                <div className="col-span-3 space-y-5">
-                    {/* contact info */}
-                    <div className="flex items-center gap-5 mt-5 border p-8 border-gray-500 rounded-2xl">
-                        <FiUser className="text-4xl" />
-                        <div className="flex-grow space-y-2">
-                            <h5 className="text-gray-500">
-                                CONTACT INFO <FiCheck className="inline-block text-2xl" />
-                            </h5>
-                            <div className="space-x-4">
-                                <span className="text-gray-600 font-bold">
-                                    {user.firstName} {user.lastName}
-                                </span>
-                                <span>|</span>
-                                <span className="text-gray-600 font-bold">{user.email}</span>
-                            </div>
+            <div className="flex gap-3 w-full flex-col lg:flex-row">
+                <div className='flex flex-grow flex-col gap-3 lg:w-2/3'>
+                    <div className='bg-pane-color rounded-2xl flex flex-col p-3'>
+                        <h5>Buyer Imformation</h5>
+                        <div className='grid grid-cols-7 md:grid-cols-6 mt-3'>
+                            <h6 className='col-span-2 md:col-span-1 text-zinc-500 row-span-2 text-sm md:text-base'>Dilver to </h6>
+                            <h6 className='col-span-5 text-sm md:text-base'>: {user.firstName + " " + user.lastName}</h6>
+                            <h6 className='col-span-5 text-sm md:text-base'>
+                                {
+                                    user.address ?
+                                        <span>{` ${user.address.no}, ${user.address.street}, ${user.address.city}`}</span>
+                                        : <span className='text-red-500'>Please add a address.</span>
+                                }
+                                <button className='ml-3 text-xl'
+                                    onClick={() => {
+                                        setAddressForm(!isAddressFormOpened);
+                                    }}
+                                ><FontAwesomeIcon icon={faPenToSquare} /></button>
+                                {
+                                    isAddressFormOpened && <AddressForm isAddressFormOpened={isAddressFormOpened} currentAdd={user.address} setAddressForm={setAddressForm} />
+                                }
+                            </h6>
+                            <h6 className='col-span-2 md:col-span-1 text-zinc-500 text-sm md:text-base'>Email to </h6>
+                            <h6 className='col-span-5 text-sm md:text-base'>: {user.email}</h6>
+                            <h6 className='col-span-2 md:col-span-1 text-zinc-500 text-sm md:text-base'>Credit Card </h6>
+                            <h6 className='col-span-5 text-sm md:text-base'>
+                                {user.creditCard ?
+                                    <span>: **** **** **** {user.creditCard.number.substring(12)}</span>
+                                    : <span className='text-red-500'>: Doesn't have a credit card. Add one</span>
+                                }
+                                <button className='ml-3 text-xl'
+                                    onClick={() => {
+                                        setCreditCardForm(!isCreditCardFormOpened);
+                                    }}
+                                ><FontAwesomeIcon icon={faPenToSquare} /></button>
+                                {
+                                    isCreditCardFormOpened && <CreditCardForm currentCard={user.creditCard} setCreditCardForm={setCreditCardForm} />
+                                }
+                            </h6>
                         </div>
                     </div>
 
-                    {/* address */}
-                    <div className="flex items-center gap-5 mt-5 border p-8 border-gray-500 rounded-2xl">
-                        <FiMapPin className="text-4xl" />
-                        <div className="flex-grow space-y-2">
-                            <h5 className="text-gray-500">
-                                SHIPPING ADDRESS{" "}
-                                {user.address ? (
-                                    <FiCheck className="inline-block text-2xl" />
-                                ) : (
-                                    <FiX className="inline-block text-2xl" />
-                                )}
-                            </h5>
-                            {user.address ? (
-                                <div className="space-x-2">
-                                    <span className="text-gray-600 font-bold">
-                                        {user.address.no},
-                                    </span>
-                                    <span className="text-gray-600 font-bold">
-                                        {user.address.street},
-                                    </span>
-                                    <span className="text-gray-600 font-bold">
-                                        {user.address.city}
-                                    </span>
-                                </div>
-                            ) : (
-                                <p className="text-gray-300">No address found</p>
-                            )}
+                    <div className='bg-pane-color p-3 rounded-2xl'>
+                        <h5 className=' text-3xl md:text-4xl'>Order Information</h5>
+                        {
+                            orderItems.map((oItem: any, i: number) => {
+                                return <OrderItem key={i} oItem={oItem} index={i} setTotal={setTotal} setOrderItemTotal={setOrderItemTotal} />
+                            })
+                        }
+                        <div className='flex items-center justify-end mt-8 mr-2'>
+                            <h5 className='text-zinc-500 mr-3 text-lg'>{orderItems.length} item(s) Sub Total</h5>
+                            <h4 className='text-price-color text-1xl md:text-2xl'> Rs. {parseFloat(total.toFixed(2))}</h4>
                         </div>
-                        <button
-                            onClick={() => setAddressForm(true)}
-                            className="text-base px-6 py-2 bg-gray-300 border border-gray-300 rounded-xl"
-                        >
-                            Change
-                        </button>
-                    </div>
-
-                    {/* payment */}
-                    <div className="flex items-center gap-5 mt-5 border p-8 border-gray-500 rounded-2xl">
-                        <FiCreditCard className="text-4xl" />
-                        <div className="flex-grow space-y-2">
-                            <h5 className="text-gray-800">
-                                Payment Method{" "}
-                                {user.creditCard ? (
-                                    <FiCheck className="inline-block text-2xl" />
-                                ) : (
-                                    <FiX className="inline-block text-2xl" />
-                                )}
-                            </h5>
-                            {user.creditCard ? (
-                                <div className="space-x-4">
-                                    <span className="text-gray-500 font-bold">VISA</span>
-                                    <span className="text-gray-500 font-bold">
-                                        **** **** **** {user.creditCard.number.substring(12, 16)}
-                                    </span>
-                                </div>
-                            ) : (
-                                <p className="text-gray-300">No credit card found</p>
-                            )}
-                        </div>
-                        <button
-                            onClick={() => setCreditCardForm(true)}
-                            className="text-base px-6 py-2 bg-gray-300 border border-gray-300 rounded-xl"
-                        >
-                            Change
-                        </button>
                     </div>
                 </div>
 
-                <div className="relative col-span-2">
+                <div className='lg:w-1/3'>
+                    <div className='flex flex-col bg-pane-color rounded-2xl p-3 w-full'>
+                        <h3 className='text-3xl md:text-4xl'>Order Summery</h3>
+                        <div className='flex justify-between items-center mt-8'>
+                            <h5 className='text-zinc-500'>Items Total</h5>
+                            <h5 className=''>Rs. {parseFloat(total.toFixed(2))}</h5>
+                        </div>
+                        <div className='flex justify-between items-center mt-3'>
+                            <h5 className='text-zinc-500'>Delivery Fee</h5>
+                            <h5 className=''>Rs. 100</h5>
+                        </div>
+                        <div className='flex justify-between items-center mt-8'>
+                            <h4>Total</h4>
+                            <h4 className='text-price-color'>Rs. {parseFloat(total.toFixed(2)) + 100}</h4>
+                        </div>
 
-                    <div className="sticky top-16">
-                        <div>
-                            <h4 className="text-gray-800 text-xl font-bold">Order Items ({cartItems.length})</h4>
-                            {cartItems.map((item: any) => (
-                                <OrderItem key={item.id} item={item} />
-                            ))}
-                        </div>
-                        <div className="flex justify-between items-center border-b py-4 border-gray-500">
-                            <p className="text-gray-600">Subtotoal</p>
-                            <p className="text-gray-800 font-semibold">Rs.{total}</p>
-                        </div>
-                        <div className="flex justify-between items-center border-b py-4 border-gray-500">
-                            <p className="text-gray-600">Shipping estimate</p>
-                            <p className="text-gray-800 font-semibold">Rs.5.00</p>
-                        </div>
-                        <div className="flex justify-between items-center border-b py-4 border-gray-500">
-                            <p className="text-gray-600">Tax estimate</p>
-                            <p className="text-gray-800 font-semibold">Rs.24.00</p>
-                        </div>
-                        <div className="flex justify-between items-center py-4">
-                            <p className="text-gray-800 font-semibold">Order Total</p>
-                            <p className="text-gray-800 font-semibold">Rs.276.00</p>
-                        </div>
-                        <Link to="/order" className="w-full h-full">
-                            <button
-                                type="button"
-                                onClick={handleOrderConfirm}
-                                className="w-full h-12 text-xl bg-main text-black font-bold rounded-3xl mt-3 hover:bg-gray-50 duration-300 ease-in-out"
-                            >
-                                Confirm Order
-                            </button>
-                        </Link>
-                        <p className="flex items-center text-sm text-gray-500 justify-center mt-4 gap-1">
-                            <FiInfo className="mr-2" />
-                            Learn more{" "}
-                            <b>
-                                <u>Taxes</u>
-                            </b>{" "}
-                            and{" "}
-                            <b>
-                                <u>Shipping</u>
-                            </b>{" "}
-                            infomation
-                        </p>
+                        <Link to='' className='bg-navbar rounded-2xl w-64 h-12 self-center mt-8'
+                            onClick={() => {
+                                placeOrderAlert();
+                            }}
+                        ><button className='text-center h-full w-full'>Place Order</button></Link>
+
                     </div>
                 </div>
+
             </div>
+        </main>
+    )
+}
 
-            {isAddressFormOpen && (
-                <AddressForm
-                    isAddressFormOpened={isAddressFormOpen}
-                    currentAdd={user.address}
-                    setAddressForm={setAddressForm}
-                />
-            )}
-            {isCreditCardFormOpen && (
-                <CreditCardForm
-                    isCreditCardFormOpened={isCreditCardFormOpen}
-                    currentCreditCard={user.creditCard}
-                    setCreditCardForm={setCreditCardForm}
-                />
-            )}
-        </div>
-    );
-};
-
-export default Order;
+export default PlaceOrder

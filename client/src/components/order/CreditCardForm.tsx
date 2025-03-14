@@ -14,8 +14,8 @@ export default function CreditCardForm({ currentCard, setCreditCardForm }: any) 
 
     function saveCreditCard() {
         let updatedUser = { ...user, cart: null, store: null }
-        delete updatedUser.cart;
-        delete updatedUser.store;
+        // delete updatedUser.cart;
+        // delete updatedUser.store;
         // let updateCreditCard = {expiration: `${creditCard.expiryMonth}/${creditCard.expiryYear}`, number: creditCard.cardNumber, cvv: creditCard.cvv}
         // updatedUser = {...updatedUser, creditCard: creditCard}
 
