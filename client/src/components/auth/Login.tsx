@@ -38,12 +38,8 @@ export default function Login({ setIsLogin }: Props) {
             }
         } catch (err) {
             console.error(err);
-            alert('Invalid email or password');
             return;
         }
-
-
-        dispatch(userActions.login(testUser));
     };
 
     return (

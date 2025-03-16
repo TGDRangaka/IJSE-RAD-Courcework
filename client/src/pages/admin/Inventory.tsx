@@ -1,9 +1,43 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ItemForm from "../../components/admin/ItemForm";
+import { api } from "../../api/api";
+import { TItem } from "../../types";
+import { FiEye } from "react-icons/fi";
+import { FaBitbucket } from "react-icons/fa";
 
 export default function Inventory() {
+    const [loading, setLoading] = useState(true);
     const [itemFormOpen, setItemFormOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState('new');
+
+    const [items, setItems] = useState<TItem[]>([]);
+
+    const getItems = async () => {
+        try {
+            const { data } = await api.get('item/all');
+            setItems(data.data);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const removeItem = async (id: string, index: number) => {
+        try {
+            await api.delete(`item/${id}`);
+            // set item isActive to false
+            const updatedItems = [...items];
+            updatedItems[index].isActive = true;
+            setItems(updatedItems);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        getItems();
+    }, [itemFormOpen])
 
     return (
         <>
@@ -33,11 +67,8 @@ export default function Inventory() {
                     <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th scope="col" className="px-6 py-3">
+                                <th scope="col" className="px-6 py-3 w-56">
                                     Product name
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Color
                                 </th>
                                 <th scope="col" className="px-6 py-3">
                                     Category
@@ -45,64 +76,73 @@ export default function Inventory() {
                                 <th scope="col" className="px-6 py-3">
                                     Price
                                 </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Stock
+                                </th>
+                                <th scope="col" className="px-8 py-3">
+                                    Active
+                                </th>
+                                <th scope="col" className="px-6 py-3 w-fit">
+
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {
-                                new Array(10).fill(null).map((_, i) => (
-                                    <tr key={i} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            Apple MacBook Pro 17"
-                                        </th>
-                                        <td className="px-6 py-4">
-                                            Silver
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            Laptop
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            $2999
-                                        </td>
+                                loading
+                                    ? <tr className="flex mt-10 justify-center w-full">
+                                        Loading...
                                     </tr>
-                                ))
+                                    : items.length == 0
+                                        ? <tr> No Data </tr>
+                                        : items.map((item: TItem, i: number) => (
+                                            <tr key={item._id} className="bg-white text-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                                <td scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                    <div className="w-56 truncate text-main font-bold">
+                                                        {item.name}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {item.category}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {item.price}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {item.stock}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {
+                                                        item.isActive
+                                                            ? <span className="text-green-500 py-1 px-3 bg-green-500/10 rounded-lg">Active</span>
+                                                            : <span className="text-red-400 py-1 px-3 bg-red-500/10 rounded-lg">Inactive</span>
+                                                    }
+                                                </td>
+                                                <td className="px-6 py-4 w-fit flex items-center gap-4 justify-end">
+                                                    <FiEye onClick={() => {
+                                                        setSelectedItem(item._id);
+                                                        setItemFormOpen(true);
+                                                    }} className="text-lg text-white cursor-pointer hover:scale-125 duration-75" />
+
+                                                    <FaBitbucket
+                                                        onClick={() => removeItem(item._id, i)}
+                                                        className="text-lg text-red-500 cursor-pointer hover:scale-125 duration-75" />
+                                                </td>
+                                            </tr>
+                                        ))
                             }
 
                         </tbody>
                     </table>
                 </div>
-
-                <div className="flex w-full justify-end mt-4">
-                    <nav aria-label="Page navigation example">
-                        <ul className="inline-flex -space-x-px text-base h-10">
-                            <li>
-                                <a href="#" className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Previous</a>
-                            </li>
-                            <li>
-                                <a href="#" className="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">1</a>
-                            </li>
-                            <li>
-                                <a href="#" className="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">2</a>
-                            </li>
-                            <li>
-                                <a href="#" aria-current="page" className="flex items-center justify-center px-4 h-10 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">3</a>
-                            </li>
-                            <li>
-                                <a href="#" className="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">4</a>
-                            </li>
-                            <li>
-                                <a href="#" className="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">5</a>
-                            </li>
-                            <li>
-                                <a href="#" className="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
             </div>
 
             {
                 itemFormOpen && (
-                    <ItemForm onClose={setItemFormOpen} isNewItem={selectedItem} />
+                    <ItemForm onClose={(v: boolean) => {
+                        setSelectedItem('new');
+                        setItemFormOpen(v);
+                    }} isNewItem={selectedItem} />
                 )
             }
         </>

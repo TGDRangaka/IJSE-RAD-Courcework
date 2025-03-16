@@ -14,10 +14,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   const logoutAlert = () => {
-    if (window.confirm('Are you sure you want to log out?')) {
-      localStorage.removeItem('user');
-      dispatch(userActions.logout());
-    }
+    dispatch(userActions.logout());
   }
 
   return (

@@ -40,12 +40,14 @@ const userSlice = createSlice({
             state.previousPage = action.payload;
         },
         setAddress: (state, action) => {
-            if(state.user) state.user.address = action.payload;
+            if (state.user) state.user.address = action.payload;
         },
         setCreditCard: (state, action) => {
-            if(state.user) state.user.creditCard = action.payload;
+            if (state.user) state.user.creditCard = action.payload;
         },
         logout: (state) => {
+            localStorage.removeItem('user')
+            localStorage.removeItem('cart')
             state.loading = false;
             state.isUserAuthed = false;
             state.error = null;

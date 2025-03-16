@@ -1,8 +1,11 @@
-import User, { IUser } from '../models/userModel';
+import User, { EUserRole, IUser } from '../models/userModel';
 import Cart from '../controller/cartController';
 import bcrypt from 'bcrypt';
 import dotenv from "dotenv";
 import { getJwtToken } from '../util/utilMatters';
+import userModel from '../models/userModel';
+import itemModel from '../models/itemModel';
+import OrderModel from '../models/orderModel';
 
 dotenv.config();
 const authToken: string = process.env.AUTH_TOKEN || 'slkdfjaslnvlksdlkjflksndlkmalkjskjsoiweoiuouewoijlkdfklasjdfkj';
@@ -10,6 +13,22 @@ const authToken: string = process.env.AUTH_TOKEN || 'slkdfjaslnvlksdlkjflksndlkm
 class UserController {
     async getAll(): Promise<IUser[]> {
         return User.find();
+    }
+
+    async getCustomers() {
+        return await User.find({ role: EUserRole.USER });
+    }
+
+    async getDashboarddata() {
+        const totalCustomers = await userModel.find({ role: EUserRole.USER });
+        const totItems = await itemModel.find({ isActive: true });
+        const totOrders = await OrderModel.find();
+
+        return {
+            totCustomers: totalCustomers.length,
+            totItems: totItems.length,
+            totOrders: totOrders.length,
+        }
     }
 
     async register(user: IUser): Promise<{ user: IUser; cart: any; store: any | null }> {

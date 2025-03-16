@@ -14,6 +14,25 @@ router.get('/', async (req: Request, res: Response) => {
     }
 });
 
+router.get('/dashboard', async (req: Request, res: Response) => {
+    try {
+        const result = await userController.getDashboarddata();
+        res.status(200).json(result);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ data: err });
+    }
+});
+
+router.get('/customers', async (req, res) => {
+    try {
+        const result = await userController.getCustomers();
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(500).json({ data: err });
+    }
+})
+
 router.post('/register', async (req: Request, res: Response) => {
     try {
         const result = await userController.register(req.body);

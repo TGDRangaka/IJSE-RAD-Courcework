@@ -9,7 +9,6 @@ type Props = {
 }
 
 const ItemForm = ({ onClose, isNewItem }: Props) => {
-    const params = useParams();
     const navigate = useNavigate();
 
     const [itemData, setItemData] = useState({
@@ -26,7 +25,7 @@ const ItemForm = ({ onClose, isNewItem }: Props) => {
     const [categories, setCategories] = useState(['Electronic Accessories', 'Electronic Devices', 'Health & Beauty', 'Babies & Toys', 'Home & Lifestyle', 'Fashion', 'Sports & Outdoor']);
 
     useEffect(() => {
-        if (params.itemId !== 'new') {
+        if (isNewItem !== 'new') {
             getItem();
             setValidations({ name: true, discount: true, price: true, description: true, image: true, stock: true, category: true })
         }
@@ -67,7 +66,7 @@ const ItemForm = ({ onClose, isNewItem }: Props) => {
         formData.append('stock', itemData.stock.toString());
         formData.append('category', itemData.category);
 
-        isNewItem ? saveItem(formData) : updateItem(formData);
+        isNewItem === 'new' ? saveItem(formData) : updateItem(formData);
 
         console.log(itemData);
     };
@@ -82,11 +81,12 @@ const ItemForm = ({ onClose, isNewItem }: Props) => {
                 showConfirmButton: false,
                 timer: 1500
             });
+            onClose(false);
         }).catch(err => console.log(err));
     }
 
     function updateItem(formData: FormData) {
-        api.put('item/' + params.itemId, formData).then(result => {
+        api.put('item/' + isNewItem, formData).then(result => {
             console.log(result);
             Swal.fire({
                 icon: 'success',
@@ -94,11 +94,12 @@ const ItemForm = ({ onClose, isNewItem }: Props) => {
                 showConfirmButton: false,
                 timer: 1500
             });
+            onClose(false);
         }).catch(err => console.log(err));
     }
 
     function getItem() {
-        api.get('item/' + params.itemId).then(result => {
+        api.get('item/' + isNewItem).then(result => {
             setItemData(result.data.data);
             setImagePreview('http://localhost:3000/sparelk/api/v1/images/' + result.data.data.image);
         }).catch(err => console.log(err));
@@ -176,7 +177,7 @@ const ItemForm = ({ onClose, isNewItem }: Props) => {
                     </div>
                     <div className="mt-6 flex justify-end">
                         <button type="submit" className="bg-blue-500 text-white mb-5 py-1 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-200">
-                            {isNewItem ? 'Add' : 'Update'} Item
+                            {isNewItem === 'new' ? 'Add' : 'Update'} Item
                         </button>
                     </div>
                 </form>

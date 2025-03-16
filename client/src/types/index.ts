@@ -7,6 +7,7 @@ export type TItem = {
     image: string;
     rating: number;
     category: string;
+    isActive?: boolean;
     sold: number;
     stock: number;
     store: {

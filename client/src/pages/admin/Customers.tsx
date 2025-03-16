@@ -1,6 +1,24 @@
+import { useEffect, useState } from "react";
+import { api } from "../../api/api";
+import { TUser } from "../../types";
 
 
 export default function Customers() {
+    const [customers, setCustomers] = useState([]);
+
+    const getCustomers = async () => {
+        try {
+            const { data } = await api.get('user/customers');
+            setCustomers(data);
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {
+        getCustomers();
+    }, [])
 
     return (
         <div className="grow p-4 bg-gray-900">
@@ -25,35 +43,46 @@ export default function Customers() {
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" className="px-6 py-3">
-                                Product name
+                                Name
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Color
+                                Email
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Category
+                                Phone
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Price
+                                Address
                             </th>
+                            {/* <th scope="col" className="px-6 py-3">
+
+                            </th> */}
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            new Array(10).fill(null).map(_ => (
-                                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        Apple MacBook Pro 17"
+                            customers.map((cus: TUser) => (
+                                <tr key={cus._id} className="bg-white border-b text-white dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                    <th scope="row" className="px-6 py-4 text-main whitespace-nowrap font-bold">
+                                        {cus.firstName} {cus.lastName}
                                     </th>
                                     <td className="px-6 py-4">
-                                        Silver
+                                        {cus.email}
                                     </td>
                                     <td className="px-6 py-4">
-                                        Laptop
+                                        {cus.phone}
                                     </td>
-                                    <td className="px-6 py-4">
-                                        $2999
-                                    </td>
+                                    {
+                                        cus.address
+                                            ? <td className="px-6 py-4">
+                                                {`${cus.address?.no}, ${cus.address?.street}, ${cus.address?.city}`}
+                                            </td>
+                                            : <td className="px-6 py-4 opacity-70">N/A</td>
+                                    }
+                                    {/* <td className="px-6 py-4">
+                                        <button className="bg-main text-gray-800 text-base font-bold py-1 px-4 rounded-lg">Edit</button>
+    
+                                    </td> */}
                                 </tr>
                             ))
                         }
@@ -62,7 +91,7 @@ export default function Customers() {
                 </table>
             </div>
 
-            <div className="flex w-full justify-end mt-4">
+            {/* <div className="flex w-full justify-end mt-4">
                 <nav aria-label="Page navigation example">
                     <ul className="inline-flex -space-x-px text-base h-10">
                         <li>
@@ -88,7 +117,7 @@ export default function Customers() {
                         </li>
                     </ul>
                 </nav>
-            </div>
+            </div> */}
         </div>
     );
 }

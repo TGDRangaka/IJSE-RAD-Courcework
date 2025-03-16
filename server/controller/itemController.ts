@@ -4,7 +4,7 @@ import {deleteImage} from '../util/utilMatters';
 
 class ItemModel {
     async getAll(): Promise<IItem[]> {
-        return Item.find({ isActive: true, stock: { $gte: 1 } });
+        return Item.find();
     }
 
     async getItem(id: string): Promise<IItem | null> {
@@ -68,8 +68,8 @@ class ItemModel {
         const item = await Item.findById(itemId);
         if (!item) throw new Error('Item not found');
 
-        deleteImage(item.image);
-        return Item.findByIdAndDelete(itemId);
+        // update item isActive to false
+        await Item.updateOne({ _id: itemId }, { $set: { isActive: false } });
     }
 }
 
