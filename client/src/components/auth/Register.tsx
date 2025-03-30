@@ -2,6 +2,8 @@ import Button from '../Button'
 import { motion } from 'framer-motion';
 import Input from './Input';
 import { useState } from 'react';
+import { api } from '../../api/api';
+import Swal from 'sweetalert2';
 
 type Props = {
     setIsLogin: (arg: boolean) => void;
@@ -13,8 +15,25 @@ export default function Register({ setIsLogin }: Props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = () => {
-        setIsLogin(true);
+    const handleSubmit = async () => {
+        try {
+            const names = name.split(' ');
+            const firstName = names.shift();
+            const lastName = names.length > 0 ? names.join(' ') : '';
+            const res = await api.post('user/register', { firstName, lastName, email, password })
+            if (res.status === 201) {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Registration Successful",
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                setTimeout(() => { }, 500)
+            }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
